@@ -264,6 +264,9 @@ if start == 'start':
                 current_month = datetime.datetime.now().strftime("%b")
                 print(Fore.GREEN + '+ Redeemed ' + emailid + ':' + passwordid + ' | ' + str(current_month) + ' ' + str(current_day))
                 print(Style.RESET_ALL)
+                with open('unbans.txt', 'a') as file:
+                    file.write(emailid + ':' + passwordid + '\n')
+                
                 sleep(2)
                 driver.get('https://www.xbox.com/en-US/auth/msa?action=logOut')
                 sleep(3)
