@@ -4,6 +4,9 @@ Selenium XGPC trial redeemer, but instead of creating accounts, uses XAG. More i
 # What's the difference?
 
 This, instead of creating accounts itself, relies on XAG (Xbox account generator) API. More info below
+# Bugs?
+
+Known ones are, if account fetching fails because it was locked, it does not know how to try again and crashes. I dont know how to make it try again and copilot is NOT helping
 
 # How can i use XAG and what's it?
 
@@ -34,10 +37,6 @@ Put your webhook on line 43
 ```
 
 Under the webhook url, there's a variable to put your XAG api key in. Again, join their discord server to earn credits and get an api key.
-
-# Any bugs?
-
-I didnt fully test lmfao but it should work. Again, it does not have error handling and purely relies on bruteforce.
 
 # Downsides?
 
