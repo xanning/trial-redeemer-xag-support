@@ -41,7 +41,7 @@ options.add_experimental_option("useAutomationExtension", False)
 driver = webdriver.Chrome(service=cService, options=options)
 
 webhook_url = ''
-token = "XAG_KEY"
+token = ""
 
 print(Fore.RED + r"""
  ____  __   __ _   _   ____ __        __   _     ____   _____ 
@@ -66,7 +66,7 @@ def get_random_line(file_path):
 def Type_Me(element: WebElement, text: str):
     for character in text:
         element.send_keys(character)
-        sleep(uniform(.08, .12))
+        sleep(uniform(.02, .06))
 wait = WebDriverWait(driver, 1000)
 
 def generateAccount():
@@ -90,6 +90,7 @@ def generateAccount():
     url = "https://start-pasting.today/api/generate?type=xbox"
     response = requests.post(url, headers=headers)
     data = response.json()
+    print(data)
     account = data["account"]
     global emailid
     global passwordid
@@ -261,7 +262,7 @@ if start == 'start':
                 global current_month
                 current_day = datetime.datetime.now().day
                 current_month = datetime.datetime.now().strftime("%b")
-                print(Fore.GREEN + '+ Redeemed ' + emailid + '@outlook.com:' + passwordid + ' | ' + str(current_month) + ' ' + str(current_day))
+                print(Fore.GREEN + '+ Redeemed ' + emailid + ':' + passwordid + ' | ' + str(current_month) + ' ' + str(current_day))
                 print(Style.RESET_ALL)
                 sleep(2)
                 driver.get('https://www.xbox.com/en-US/auth/msa?action=logOut')
