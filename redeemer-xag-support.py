@@ -124,12 +124,9 @@ def generateAccount():
         button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
         button.click()
 
-        wait.until(EC.title_contains('Consent'))
-        sleep(3)
-        button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
-        sleep(3)
-        button.click()
-        sleep(4)
+        wait.until(EC.title_contains('Xbox Official'))
+    sleep(2)
+        
 
 
 start = input("Type 'start' to begin checking codes: ")
@@ -238,7 +235,7 @@ if start == 'start':
                 sleep(3)
                 driver.delete_all_cookies()
                 sleep(1)
-            generateAccount()
+                generateAccount()
                 # pls god strike this nigga down
                 
            
