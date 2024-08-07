@@ -216,7 +216,42 @@ if start == 'start':
                  WebDriverWait(driver, 5000).until(EC.presence_of_element_located((By.CLASS_NAME, "lightweight--_B359BGN.base--goua8jma")))
                 get_random_cc_info()
                 do_payment()
+                sleep(3)
+                txt = driver.find_element(By.CLASS_NAME, 'lightweight--_B359BGN.base--goua8jma')
+                txt.click()
+
+                WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, 'pidlddc-text-profileAddressPageSubheading')))
+                WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, 'pidlddc-text-profileAddressPageSubheading')))
                
+                address_line1 = driver.find_element(By.ID,"address_line1")
+                address_line1.click()
+                address_line1.send_keys('9027 Fairground Circle')
+
+                address_line2 = driver.find_element(By.ID,"city")
+                address_line2.click()
+                address_line2.send_keys('Oceanside')
+                
+                region = driver.find_element(By.ID,"input_region")
+                
+                region.send_keys('New York')
+
+                postal = driver.find_element(By.ID,"postal_code")
+                postal.click()
+                postal.send_keys('11572')
+                save1 = driver.find_element(By.ID,"pidlddc-button-saveButton")
+                save1.click()
+                WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, 'pidlddc-button-addressUseButton')))
+
+
+                sleep(1)
+                save2 = driver.find_element(By.ID,"pidlddc-button-addressUseButton")
+                save2.click()
+                WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "primary--kLopxQTl.base--goua8jma")))
+                sleep(1)
+                cbf = driver.find_element(By.CLASS_NAME, 'primary--kLopxQTl.base--goua8jma')
+                cbf.click()
+                sleep(23)
+
 
                 
 
