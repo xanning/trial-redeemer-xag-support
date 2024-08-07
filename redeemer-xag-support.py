@@ -100,13 +100,16 @@ def generateAccount():
     print("fetched from XAG "+ emailid + ":" + passwordid + " | -4" + " | New balance: " + str(balance - 4))
     url = "https://xbox.com/en-US/auth/msa?action=logIn"
     driver.get(url)
-    
+    sleep(1)
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@name="loginfmt"]'))) 
     Type_Me(element, emailid)
+    sleep(1)
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
     element.click()
+    sleep(1)
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@name="passwd"]'))) 
     Type_Me(element, passwordid)
+    sleep(1)
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
     element.click()
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="declineButton"]')))
@@ -122,10 +125,7 @@ def generateAccount():
         button.click()
 
         wait.until(EC.title_contains('Consent'))
-        sleep(2)
-        button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
-        button.click()
-    sleep(4)
+        
 
 
 start = input("Type 'start' to begin checking codes: ")
@@ -213,47 +213,9 @@ if start == 'start':
                  save1 = driver.find_element(By.ID,"pidlddc-button-saveButton")
                  save1.click()
                  WebDriverWait(driver, 5000).until(EC.presence_of_element_located((By.CLASS_NAME, "lightweight--_B359BGN.base--goua8jma")))
-                try:
-                    get_random_cc_info()
-                    do_payment()
-                except:
-                    get_random_cc_info()
-                    do_payment()
-                sleep(3)
-                txt = driver.find_element(By.CLASS_NAME, 'lightweight--_B359BGN.base--goua8jma')
-                txt.click()
-
-                WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, 'pidlddc-text-profileAddressPageSubheading')))
-                WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, 'pidlddc-text-profileAddressPageSubheading')))
+                get_random_cc_info()
+                do_payment()
                
-                address_line1 = driver.find_element(By.ID,"address_line1")
-                address_line1.click()
-                address_line1.send_keys('9027 Fairground Circle')
-
-                address_line2 = driver.find_element(By.ID,"city")
-                address_line2.click()
-                address_line2.send_keys('Oceanside')
-                
-                region = driver.find_element(By.ID,"input_region")
-                
-                region.send_keys('New York')
-
-                postal = driver.find_element(By.ID,"postal_code")
-                postal.click()
-                postal.send_keys('11572')
-                save1 = driver.find_element(By.ID,"pidlddc-button-saveButton")
-                save1.click()
-                WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, 'pidlddc-button-addressUseButton')))
-
-
-                sleep(1)
-                save2 = driver.find_element(By.ID,"pidlddc-button-addressUseButton")
-                save2.click()
-                WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "primary--kLopxQTl.base--goua8jma")))
-                sleep(1)
-                cbf = driver.find_element(By.CLASS_NAME, 'primary--kLopxQTl.base--goua8jma')
-                cbf.click()
-                sleep(23)
 
                 
 
@@ -272,7 +234,7 @@ if start == 'start':
                 sleep(3)
                 driver.delete_all_cookies()
                 sleep(1)
-                generateAccount()
+            generateAccount()
                 # pls god strike this nigga down
                 
            
