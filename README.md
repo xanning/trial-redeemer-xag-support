@@ -12,7 +12,7 @@ Known ones are, if account fetching fails because it was locked, it does not kno
 # How can i use XAG and what's it?
 XAG is basically a Microsoft account gen that you can generate and pull ready to redeem accounts from, so we don't have to solve captchas.
 It's both free-to-use and you can also pay for credits. Join their discord server to get your API key (which you will use) and learn more about how you can earn credits.
-https://discord.gg/DrvD5x4SN6 
+https://discord.gg/AFjxMDkS3K
 # How to use this new script?
 This is basically same as the other one, redeeming part bugs will happen again because i didn't fix them lmao, but should have less bugs because there's no account creation
 Do the things you need to do like the other repo. (webhook url etc)
