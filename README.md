@@ -1,6 +1,3 @@
-# I am termed, and i'll be never coming back to these things.
-
-# ANY OF THE LINKS THAT THIS REPO INCLUDES IS NOT THE NEW MCALTS SERVER. IT'S GONE.
 
 # trial-redeemer-xag-support
 Selenium XGPC trial redeemer, but instead of creating accounts, uses XAG. More info in readme.
