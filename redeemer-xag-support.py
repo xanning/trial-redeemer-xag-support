@@ -9,7 +9,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webelement import WebElement
 from random import randint, uniform, shuffle, choice
-from selenium_stealth import stealth
 import re
 import random
 import string
@@ -123,7 +122,11 @@ def generateAccount():
         sleep(2)
         button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
         button.click()
-
+        
+        wait.until(EC.title_contains('Consent'))
+        sleep(2)
+        button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+        button.click()
         wait.until(EC.title_contains('Xbox Official'))
     sleep(2)
         
@@ -213,11 +216,11 @@ if start == 'start':
 
                  save1 = driver.find_element(By.ID,"pidlddc-button-saveButton")
                  save1.click()
-                 WebDriverWait(driver, 5000).until(EC.presence_of_element_located((By.CLASS_NAME, "lightweight--_B359BGN.base--goua8jma")))
+                 WebDriverWait(driver, 5000).until(EC.presence_of_element_located((By.CLASS_NAME, "lightweight--qRCncd42.base--HZtGIsEc")))
                 get_random_cc_info()
                 do_payment()
                 sleep(3)
-                txt = driver.find_element(By.CLASS_NAME, 'lightweight--_B359BGN.base--goua8jma')
+                txt = driver.find_element(By.CLASS_NAME, 'lightweight--qRCncd42.base--HZtGIsEc')
                 txt.click()
 
                 WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, 'pidlddc-text-profileAddressPageSubheading')))
@@ -246,9 +249,9 @@ if start == 'start':
                 sleep(1)
                 save2 = driver.find_element(By.ID,"pidlddc-button-addressUseButton")
                 save2.click()
-                WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "primary--kLopxQTl.base--goua8jma")))
+                WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "primary--wA51gMLW.base--HZtGIsEc")))
                 sleep(1)
-                cbf = driver.find_element(By.CLASS_NAME, 'primary--kLopxQTl.base--goua8jma')
+                cbf = driver.find_element(By.CLASS_NAME, 'primary--wA51gMLW.base--HZtGIsEc')
                 cbf.click()
                 sleep(23)
 
