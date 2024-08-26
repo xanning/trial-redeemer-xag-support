@@ -19,7 +19,7 @@ It's both free-to-use and you can also pay for credits. Join their discord serve
 https://discord.gg/AFjxMDkS3K
 # How to use this new script?
 This is basically same as the other one, redeeming part bugs will happen again because i didn't fix them lmao, but should have less bugs because there's no account creation
-Do the things you need to do like the other repo. (webhook url etc)
+Do the things you need to do like the other repo. (requirements etc):
 ```
 Install the requirements (requests, selenium, colorama, urllib3 etc)
 Set your path to chromedriver on line 31, 33 and 34 (One should be it but i dont remember lmfao)
