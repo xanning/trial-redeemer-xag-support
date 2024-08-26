@@ -29,3 +29,9 @@ Have the names.txt on the same folder as the script
 ```
 At line 45 there's a variable to put your XAG api key in. Again, join their discord server to earn credits and get an api key.
 
+# Flags?
+
+Flags are in-testing features. Current ones are:
+
+`start --autoname` Automatically sets a profile name in FurinaXGP_random5letter format. You can change this on the bottom of the code i think.
+
