@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webelement import WebElement
 from random import randint, uniform, shuffle, choice
+from urllib.parse import urlparse, parse_qs
 import re
 import random
 import string
@@ -28,6 +29,7 @@ from colorama import Fore, Back, Style
 clear = lambda: os.system('cls')
 # Set the path to the Chrome driver executable
 driver_path = 'C:/chromedriver-win64/chromedriver.exe'
+sFTTag_url = "https://login.live.com/oauth20_authorize.srf?client_id=00000000402B5328&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=service::user.auth.xboxlive.com::MBI_SSL&display=touch&response_type=token&locale=en"
 
 cService = webdriver.ChromeService(executable_path='C:/chromedriver-win64/chromedriver.exe')
 service = Service('C:\Program Files\Chrome Driver\chromedriver.exe')
@@ -39,8 +41,7 @@ options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option("useAutomationExtension", False) 
 driver = webdriver.Chrome(service=cService, options=options)
 
-webhook_url = ''
-token = ""
+XAGtoken = ""
 
 print(Fore.RED + r"""
  ____  __   __ _   _   ____ __        __   _     ____   _____ 
@@ -79,7 +80,7 @@ def generateAccount():
     # Check for balance
     url = "https://start-pasting.today/api/coins"
     headers = {
-    "api-token": token
+    "api-token": XAGtoken
     }
     response = requests.get(url, headers=headers)
     data = response.json()
@@ -131,9 +132,86 @@ def generateAccount():
     sleep(2)
         
 
+def get_urlPost_sFTTag(session):
+    global retries
+    while True: #will retry forever until it gets a working request/url.
+        try:
+            r = session.get(sFTTag_url, timeout=15)
+            text = r.text
+            match = re.match(r'.*value="(.+?)".*', text, re.S)
+            if match is not None:
+                sFTTag = match.group(1)
+                match = re.match(r".*urlPost:'(.+?)'.*", text, re.S)
+                if match is not None:
+                    return match.group(1), sFTTag, session
+        except: pass
+        
 
-start = input("Type 'start' to begin checking codes: ")
-if start == 'start':
+def get_xbox_rps(session, email, password, urlPost, sFTTag):
+            global bad, checked, cpm, twofa, retries, checked
+            data = {'login': email, 'loginfmt': email, 'passwd': password, 'PPFT': sFTTag}
+            login_request = session.post(urlPost, data=data, headers={'Content-Type': 'application/x-www-form-urlencoded'}, allow_redirects=True, timeout=15)
+            if '#' in login_request.url and login_request.url != sFTTag_url:
+                token = parse_qs(urlparse(login_request.url).fragment).get('access_token', ["None"])[0]
+                
+                if token != "None":
+                    return token, session
+            elif 'cancel?mkt=' in login_request.text:
+                data = {
+                    'ipt': re.search('(?<=\"ipt\" value=\").+?(?=\">)', login_request.text).group(),
+                    'pprid': re.search('(?<=\"pprid\" value=\").+?(?=\">)', login_request.text).group(),
+                    'uaid': re.search('(?<=\"uaid\" value=\").+?(?=\">)', login_request.text).group()
+                }
+                ret = session.post(re.search('(?<=id=\"fmHF\" action=\").+?(?=\" )', login_request.text).group(), data=data, allow_redirects=True)
+                fin = session.get(re.search('(?<=\"recoveryCancel\":{\"returnUrl\":\").+?(?=\",)', ret.text).group(), allow_redirects=True)
+                token = parse_qs(urlparse(fin.url).fragment).get('access_token', ["None"])[0]
+                if token != "None":
+                    return token, session
+def mc_token(session, uhs, xsts_token):
+    global retries
+    while True:
+        try:
+            mc_login = session.post('https://api.minecraftservices.com/authentication/login_with_xbox', json={'identityToken': f"XBL3.0 x={uhs};{xsts_token}"}, headers={'Content-Type': 'application/json'}, timeout=15)
+            if mc_login.status_code == 429:
+                continue
+            else:
+                return mc_login.json().get('access_token')
+        except:
+           
+            continue
+
+def authenticate(email, password, tries = 0):
+    global retries, bad, checked, cpm
+    try:
+        session = requests.Session()
+        session.verify = True
+        urlPost, sFTTag, session = get_urlPost_sFTTag(session)
+        token, session = get_xbox_rps(session, email, password, urlPost, sFTTag)
+        if token != "None":
+            hit = False
+            try:
+                xbox_login = session.post('https://user.auth.xboxlive.com/user/authenticate', json={"Properties": {"AuthMethod": "RPS", "SiteName": "user.auth.xboxlive.com", "RpsTicket": token}, "RelyingParty": "http://auth.xboxlive.com", "TokenType": "JWT"}, headers={'Content-Type': 'application/json', 'Accept': 'application/json'}, timeout=15)
+                js = xbox_login.json()
+                xbox_token = js.get('Token')
+                if xbox_token != None:
+                    uhs = js['DisplayClaims']['xui'][0]['uhs']
+                    xsts = session.post('https://xsts.auth.xboxlive.com/xsts/authorize', json={"Properties": {"SandboxId": "RETAIL", "UserTokens": [xbox_token]}, "RelyingParty": "rp://api.minecraftservices.com/", "TokenType": "JWT"}, headers={'Content-Type': 'application/json', 'Accept': 'application/json'}, timeout=15)
+                    js = xsts.json()
+                    xsts_token = js.get('Token')
+                    if xsts_token != None:
+                        access_token = mc_token(session, uhs, xsts_token)
+                        if access_token != None:
+                            return access_token
+            except: pass
+            
+    except:
+       print(Fore.RED+f"Failed to namechange: {email}:{password}")
+    finally:
+        session.close()
+
+
+start = input("Type 'start' to begin. \n Accepted flags are: \"--autoname\" (Sets profile automatically) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n >")
+if start.startswith('start'):
         generateAccount()
         
                     
@@ -254,9 +332,7 @@ if start == 'start':
                 cbf = driver.find_element(By.CLASS_NAME, 'primary--wA51gMLW.base--HZtGIsEc')
                 cbf.click()
                 sleep(23)
-
-
-                
+             
 
                 
                 global current_day
@@ -265,6 +341,31 @@ if start == 'start':
                 current_month = datetime.datetime.now().strftime("%b")
                 print(Fore.GREEN + '+ Redeemed ' + emailid + ':' + passwordid + ' | ' + str(current_month) + ' ' + str(current_day))
                 print(Style.RESET_ALL)
+                if "--autoname" in start:
+                    print(Fore.YELLOW + 'Attempting to set profile: ' + emailid + ':' + passwordid)
+                    
+                    token = authenticate(emailid, passwordid)
+                    urlget = f"https://api.minecraftservices.com/entitlements/mcstore"
+
+                    headersget = {'Authorization': f'Bearer {token}', 'Accept': 'application/json', 'Content-Type': 'application/json'}
+                    responseget = requests.get(urlget,headers=headersget)
+                    name = "FurinaXGP_" + ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+                    sleep(2)
+                    url = f"https://api.minecraftservices.com/minecraft/profile"
+                    body = {
+                        "profileName": name
+                    }
+                    headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/json', 'Content-Type': 'application/json'}
+                    response = requests.post(url,headers=headers, json=body)
+                    response_json = response.json()
+                    if "ACTIVE" in str(response_json):
+                        print(Fore.GREEN + "+ " + emailid + ' + Name changed to ' + name)
+                        print(Style.RESET_ALL)
+                    else:
+                        print(Fore.RED + "- " + emailid + ' - Name change failed:')
+                        print(response_json)
+                        print(Style.RESET_ALL)
+                
                 with open('unbans.txt', 'a') as file:
                     file.write(emailid + ':' + passwordid + '\n')
                 
@@ -273,7 +374,9 @@ if start == 'start':
                 sleep(3)
                 driver.delete_all_cookies()
                 sleep(1)
+              
                 generateAccount()
+
                 # pls god strike this nigga down
                 
            
