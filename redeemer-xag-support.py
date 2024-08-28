@@ -1,46 +1,44 @@
 import datetime
 import pprint
 from time import sleep
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.remote.webelement import WebElement
-from random import randint, uniform, shuffle, choice
-from urllib.parse import urlparse, parse_qs
+from selenium import webdriver # Required
+from selenium.webdriver.chrome.options import Options  # Required
+from selenium.webdriver.chrome.service import Service  # Required
+from selenium.webdriver.common.by import By  # Required
+from selenium.webdriver.support.ui import WebDriverWait  # Required
+from selenium.webdriver.support import expected_conditions as EC # Probably don't need it.
+from selenium.webdriver.remote.webelement import WebElement # Probably don't need it.
+from random import randint, uniform, shuffle, choice # Required
+from urllib.parse import urlparse, parse_qs # Required
+# Required
 import re
 import random
 import string
 import os
 import requests
-import platform
-import asyncio
-import base64
 import json
 import random
-from typing import Dict, Any
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-import aiohttp
-import requests
-from colorama import Fore, Back, Style
+from typing import Dict, Any # Required
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities # Probably don't need it.
+from colorama import Fore, Back, Style # Required
 # haha funny i dont know how to import only necessary modules so here's a 27 line import for no reason LMFAO
 clear = lambda: os.system('cls')
-# Set the path to the Chrome driver executable
+# Set the path to the Chrome driver executable HERE
 driver_path = 'C:/chromedriver-win64/chromedriver.exe'
+# Do not change this unless you know what you're doing
 sFTTag_url = "https://login.live.com/oauth20_authorize.srf?client_id=00000000402B5328&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=service::user.auth.xboxlive.com::MBI_SSL&display=touch&response_type=token&locale=en"
-
-cService = webdriver.ChromeService(executable_path='C:/chromedriver-win64/chromedriver.exe')
-service = Service('C:\Program Files\Chrome Driver\chromedriver.exe')
+# Do not change this
+cService = webdriver.ChromeService(executable_path=driver_path)
+# Modify chrome options if you want. Experimental options i added was for testing and i left it like that.
 options = webdriver.ChromeOptions()
 options.add_argument('--start-maximized')
 options.add_argument('--lang=en')
 options.add_argument("--disable-blink-features=AutomationControlled") 
-options.add_experimental_option("excludeSwitches", ["enable-automation"]) 
+options.add_argument('--log-level=1') # More suppressing shi that hoping it will work
+options.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"]) # Disabled logging cuz stupid
 options.add_experimental_option("useAutomationExtension", False) 
-driver = webdriver.Chrome(service=cService, options=options)
 
+# Put your XAG api token here
 XAGtoken = ""
 
 print(Fore.RED + r"""
@@ -54,9 +52,15 @@ print(Fore.RED + r"""
 print(Style.RESET_ALL)
 print(Fore.GREEN + "I do not fucking know how to python")
 print(Fore.GREEN + " ")
-print(Fore.GREEN + " ")
 print(Fore.LIGHTCYAN_EX + "[XGPC Redeemer]")
+print(Fore.GREEN + " ")
+print(Fore.LIGHTCYAN_EX + "[1] Pre-check your codes")
+print(Fore.LIGHTCYAN_EX + "[2] Run redeemer")
+print(Fore.LIGHTRED_EX + "Changelog: Added --debug, Added pre-check codes option, Removed unnecessary code")
+print(Fore.LIGHTRED_EX + " Removed unnecessary logging, New bug: Ctrl+C doesn't close Selenium window. Have to close it yourself")
 print(Style.RESET_ALL) 
+
+driver = webdriver.Chrome(service=cService, options=options)
 def get_random_line(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -66,15 +70,17 @@ def get_random_line(file_path):
 def Type_Me(element: WebElement, text: str):
     for character in text:
         element.send_keys(character)
-        sleep(uniform(.02, .06))
-wait = WebDriverWait(driver, 1000)
+        sleep(uniform(.02, .06)) # If you want you can change .02 and .06 to lower/higher values to increase/decrease typing speed on Sign In page
+wait = WebDriverWait(driver, 1000) # Default timeout.
 
-def generateAccount():
-    
+def generateAccount(debug_mode_enabled):
+    debugMode = debug_mode_enabled
     # Check for stock
     url = "https://start-pasting.today/api/stock"
     response = requests.get(url)
     data = response.json()
+    if debugMode:
+        print(data)
     normal_accounts = data["normal_accounts"]
     print(str(normal_accounts) + " accounts in XAG")
     # Check for balance
@@ -83,21 +89,25 @@ def generateAccount():
     "api-token": XAGtoken
     }
     response = requests.get(url, headers=headers)
+    
     data = response.json()
+    if debugMode:
+        print(data)
     balance = data["coins"]
     print(str(balance) + " balance")
     # Generate an account
     url = "https://start-pasting.today/api/generate?type=xbox"
     response = requests.post(url, headers=headers)
     data = response.json()
-    print(data)
+    if debugMode:
+        print(data)
     account = data["account"]
     global emailid
     global passwordid
     emailid = account["email"]
     passwordid = account["password"]
     username = account["username"]
-    print("fetched from XAG "+ emailid + ":" + passwordid + " | -4" + " | New balance: " + str(balance - 4))
+    print("fetched from XAG "+ emailid + ":" + passwordid + " | -4" + " | New balance: " + str(balance - 4)) # I know this is stupid but the ratelimit..
     url = "https://xbox.com/en-US/auth/msa?action=logIn"
     driver.get(url)
     sleep(1)
@@ -131,7 +141,71 @@ def generateAccount():
         wait.until(EC.title_contains('Xbox Official'))
     sleep(2)
         
+def preCheckCodes(token):
+    with open("codes.txt", "r") as file:
+        codes = [line.strip() for line in file]
+    valid_count = 0
+    used_count = 0
+    invalid_count = 0
 
+    if len(codes) == 0:
+        print(Fore.RED + "No codes found in codes.txt")
+        input("Press Enter to exit...")
+        print(Style.RESET_ALL)
+        exit()
+    print(Fore.LIGHTCYAN_EX + f"Loaded {len(codes)} codes")
+    print(Fore.LIGHTCYAN_EX + " ")
+    print(Style.RESET_ALL)
+    input("Press Enter to start checking codes...")    
+    for code in codes:
+        url = "https://emerald.xboxservices.com/xboxcomfd/buddypass/ValidateOfferRedeemer?market=US&offerId=" + code
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0",
+            "Accept": "*/*",
+            "Accept-Language": "en-US,en;q=0.5",
+            "authorization": token,
+            "ms-cv": "Vm15+ysrWjVTvjwVU6gQBq.11",
+            "x-ms-api-version": "1.0",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "cross-site",
+            "Priority": "u=4"
+        }
+ 
+
+        response = requests.get(url, headers=headers)
+        if response.status_code == 401:
+            print(Fore.RED + "Invalid token")
+            input("Press Enter to exit...")
+            print(Style.RESET_ALL)
+            exit()
+        if response.text == "\"ClaimedOffersMaxed\"":
+         used_count += 1
+         print(Fore.YELLOW + f"- {code} is used ({used_count})")
+        elif response.text == "\"OfferValid\"":
+            valid_count += 1
+            print(Fore.GREEN + f"+ {code} is eligible ({valid_count}) | saved to valid_codes.txt")
+            with open("valid_codes.txt", "a") as file:
+                file.write(code + "\n")
+        elif response.text == "\"OfferNotFound\"":
+            invalid_count += 1
+            print(Fore.RED + f"- {code} is invalid ({invalid_count})") 
+        elif response.text == "\"OfferAlreadyClaimed\"":
+            invalid_count += 1
+            print(Fore.RED + f"- {code} is used ({used_count})")
+        else:
+            print(Fore.RED + f"- {code} is {response.text}")   
+
+    print(Fore.RED + f"- Invalid Codes: {invalid_count}")
+    print(Fore.GREEN + f"+ Valid Codes: {valid_count}")
+    print(Fore.YELLOW + f"- Used Codes: {used_count}")
+    print(Style.RESET_ALL)
+    input("Press Enter to exit...")
+    print(Style.RESET_ALL)
+    exit()
+
+    
 def get_urlPost_sFTTag(session):
     global retries
     while True: #will retry forever until it gets a working request/url.
@@ -209,10 +283,13 @@ def authenticate(email, password, tries = 0):
     finally:
         session.close()
 
-
-start = input("Type 'start' to begin. \n Accepted flags are: \"--autoname\" (Sets profile automatically) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n >")
-if start.startswith('start'):
-        generateAccount()
+def redeemer():
+    start = input("Type 'start' to begin. \n Accepted flags are: \"--autoname\" (Sets profile automatically) \n \"--debug\" (Prints the JSON responses from XAG API calls) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
+    if start.startswith('start'):
+        if "--debug" in start:
+            generateAccount(True)
+        else:
+            generateAccount(False)
         
                     
         # List of codes to check
@@ -222,7 +299,7 @@ if start.startswith('start'):
                 code = line.strip()
                 codes.append(code)
         valid_count = 0
-        invalid_count = 0
+       
 
         for code in codes:
             
@@ -348,7 +425,7 @@ if start.startswith('start'):
                     urlget = f"https://api.minecraftservices.com/entitlements/mcstore"
 
                     headersget = {'Authorization': f'Bearer {token}', 'Accept': 'application/json', 'Content-Type': 'application/json'}
-                    responseget = requests.get(urlget,headers=headersget)
+                    
                     name = "FurinaXGP_" + ''.join(random.choices(string.ascii_letters + string.digits, k=5))
                     sleep(2)
                     url = f"https://api.minecraftservices.com/minecraft/profile"
@@ -376,17 +453,14 @@ if start.startswith('start'):
                 sleep(1)
               
                 generateAccount()
-
                 # pls god strike this nigga down
-                
-           
-                
-
-                
-            
-
-driver.quit()
-print(Fore.GREEN + '+ end | ' + str(valid_count))
-print(Style.RESET_ALL)
-
+Input = input(">")
+if Input == "1":
+    xbltoken = input(Fore.BLUE + "Enter your XBL token:")
+    preCheckCodes(xbltoken)
+if Input == "2":
+    redeemer()
+    driver.quit()
+    print(Fore.YELLOW + 'End of codes!')
+    print(Style.RESET_ALL)
 
