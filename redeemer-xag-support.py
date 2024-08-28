@@ -284,7 +284,7 @@ def authenticate(email, password, tries = 0):
         session.close()
 
 def redeemer():
-    start = input("Type 'start' to begin. \n Accepted flags are: \"--autoname\" (Sets profile automatically) \n \"--debug\" (Prints the JSON responses from XAG API calls) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
+    start = input("Type 'start' to begin. \n Accepted flags are: \n \"--autoname\" (Sets profile automatically) \n \"--debug\" (Prints the JSON responses from XAG API calls) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
     if start.startswith('start'):
         if "--debug" in start:
             generateAccount(True)
@@ -422,10 +422,11 @@ def redeemer():
                     print(Fore.YELLOW + 'Attempting to set profile: ' + emailid + ':' + passwordid)
                     
                     token = authenticate(emailid, passwordid)
+                    
                     urlget = f"https://api.minecraftservices.com/entitlements/mcstore"
 
                     headersget = {'Authorization': f'Bearer {token}', 'Accept': 'application/json', 'Content-Type': 'application/json'}
-                    
+                    requests.get(urlget,headers=headersget)
                     name = "FurinaXGP_" + ''.join(random.choices(string.ascii_letters + string.digits, k=5))
                     sleep(2)
                     url = f"https://api.minecraftservices.com/minecraft/profile"
