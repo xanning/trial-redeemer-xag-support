@@ -156,7 +156,7 @@ def preCheckCodes(token):
     print(Fore.LIGHTCYAN_EX + f"Loaded {len(codes)} codes")
     print(Fore.LIGHTCYAN_EX + " ")
     print(Style.RESET_ALL)
-    input("Press Enter to start checking codes...")    
+    input("Press Enter to start checking codes... | This will remove all invalid codes from your codes.txt!")    
     for code in codes:
         url = "https://emerald.xboxservices.com/xboxcomfd/buddypass/ValidateOfferRedeemer?market=US&offerId=" + code
 
@@ -181,19 +181,39 @@ def preCheckCodes(token):
             print(Style.RESET_ALL)
             exit()
         if response.text == "\"ClaimedOffersMaxed\"":
-         used_count += 1
-         print(Fore.YELLOW + f"- {code} is used ({used_count})")
+            used_count += 1
+            print(Fore.YELLOW + f"- {code} is used ({used_count})")
+            with open("codes.txt", "r") as f:
+                lines = f.readlines()
+            with open("codes.txt", "w") as f:
+                for line in lines:
+                    if line.strip("\n") != code:
+                        f.write(line)
+
         elif response.text == "\"OfferValid\"":
             valid_count += 1
-            print(Fore.GREEN + f"+ {code} is eligible ({valid_count}) | saved to valid_codes.txt")
-            with open("valid_codes.txt", "a") as file:
-                file.write(code + "\n")
+            print(Fore.GREEN + f"+ {code} is eligible ({valid_count})")
+            
         elif response.text == "\"OfferNotFound\"":
             invalid_count += 1
             print(Fore.RED + f"- {code} is invalid ({invalid_count})") 
+            with open("codes.txt", "r") as f:
+                lines = f.readlines()
+            with open("codes.txt", "w") as f:
+                for line in lines:
+                    if line.strip("\n") != code:
+                        f.write(line)
+
         elif response.text == "\"OfferAlreadyClaimed\"":
             invalid_count += 1
             print(Fore.RED + f"- {code} is used ({used_count})")
+            with open("codes.txt", "r") as f:
+                lines = f.readlines()
+            with open("codes.txt", "w") as f:
+                for line in lines:
+                    if line.strip("\n") != code:
+                        f.write(line)
+
         else:
             print(Fore.RED + f"- {code} is {response.text}")   
 
