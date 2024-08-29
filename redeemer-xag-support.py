@@ -56,8 +56,7 @@ print(Fore.LIGHTCYAN_EX + "[XGPC Redeemer]")
 print(Fore.GREEN + " ")
 print(Fore.LIGHTCYAN_EX + "[1] Pre-check your codes")
 print(Fore.LIGHTCYAN_EX + "[2] Run redeemer")
-print(Fore.LIGHTRED_EX + "Changelog: Added --debug, Added pre-check codes option, Removed unnecessary code")
-print(Fore.LIGHTRED_EX + " Removed unnecessary logging, New bug: Ctrl+C doesn't close Selenium window. Have to close it yourself")
+print(Fore.LIGHTRED_EX + "Changelog: Removed --debug")
 print(Style.RESET_ALL) 
 
 driver = webdriver.Chrome(service=cService, options=options)
@@ -73,14 +72,12 @@ def Type_Me(element: WebElement, text: str):
         sleep(uniform(.02, .06)) # If you want you can change .02 and .06 to lower/higher values to increase/decrease typing speed on Sign In page
 wait = WebDriverWait(driver, 1000) # Default timeout.
 
-def generateAccount(debug_mode_enabled):
-    debugMode = debug_mode_enabled
-    # Check for stock
+def generateAccount():
+   
     url = "https://start-pasting.today/api/stock"
     response = requests.get(url)
     data = response.json()
-    if debugMode:
-        print(data)
+   
     normal_accounts = data["normal_accounts"]
     print(str(normal_accounts) + " accounts in XAG")
     # Check for balance
@@ -91,16 +88,14 @@ def generateAccount(debug_mode_enabled):
     response = requests.get(url, headers=headers)
     
     data = response.json()
-    if debugMode:
-        print(data)
+   
     balance = data["coins"]
     print(str(balance) + " balance")
     # Generate an account
     url = "https://start-pasting.today/api/generate?type=xbox"
     response = requests.post(url, headers=headers)
     data = response.json()
-    if debugMode:
-        print(data)
+  
     account = data["account"]
     global emailid
     global passwordid
@@ -215,7 +210,7 @@ def preCheckCodes(token):
                         f.write(line)
 
         else:
-            print(Fore.RED + f"- {code} is {response.text}")   
+            print(Fore.RED + f"? {code} is {response.text}")   
 
     print(Fore.RED + f"- Invalid Codes: {invalid_count}")
     print(Fore.GREEN + f"+ Valid Codes: {valid_count}")
@@ -304,13 +299,9 @@ def authenticate(email, password, tries = 0):
         session.close()
 
 def redeemer():
-    start = input("Type 'start' to begin. \n Accepted flags are: \n \"--autoname\" (Sets profile automatically) \n \"--debug\" (Prints the JSON responses from XAG API calls) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
+    start = input("Type 'start' to begin. \n Accepted flags are: \n \"--autoname\" (Sets profile automatically) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
     if start.startswith('start'):
-        if "--debug" in start:
-            generateAccount(True)
-        else:
-            generateAccount(False)
-        
+        generateAccount()
                     
         # List of codes to check
         codes = []
