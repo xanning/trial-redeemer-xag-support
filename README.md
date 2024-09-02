@@ -1,3 +1,7 @@
+# XAG got discontinued
+
+This project is no longer maintained. Code still works, you can delete the xag fetching part, turn it into something that logins on accounts from outlooks.txt etc
+
 
 # trial-redeemer-xag-support
 Selenium XGPC trial redeemer, but instead of creating accounts, uses XAG. More info in readme.
