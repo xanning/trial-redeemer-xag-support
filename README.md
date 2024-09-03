@@ -6,9 +6,17 @@ This, instead of creating accounts itself, relies on XAG (Xbox account generator
 # Bugs?
 Known ones are:
 
-if account fetching fails because it was locked, it does not know how to try again and crashes. | Fixed in dev version, on release soon
+if account fetching fails because it was locked, it does not know how to try again and crashes. | Fixed
 
-If selecting a pregenerated username on xbox gamertag set page fails, it just waits for you to click the other one
+If selecting a pregenerated username on xbox gamertag set page fails, it just waits for you to click the other one | Fixed
+
+^ Above bugs fixes are still in testing if anything out of ordinary happens please open an issue
+
+Non-fixed bugs:
+
+If Microsoft auth gives an error (contextid didnt match cookie) etc, it just hangs.
+
+On "Try a different way to pay" on redeeming isn't fixed.
 
 # How can i use XAG and what's it?
 XAG is basically a Microsoft account gen that you can generate and pull ready to redeem accounts from, so we don't have to solve captchas.
