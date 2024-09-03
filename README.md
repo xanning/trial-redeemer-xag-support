@@ -6,7 +6,7 @@ This, instead of creating accounts itself, relies on XAG (Xbox account generator
 # Bugs?
 Known ones are:
 
-if account fetching fails because it was locked, it does not know how to try again and crashes. I dont know how to make it try again and copilot is NOT helping
+if account fetching fails because it was locked, it does not know how to try again and crashes. | Fixed in dev version, on release soon
 
 If selecting a pregenerated username on xbox gamertag set page fails, it just waits for you to click the other one
 
