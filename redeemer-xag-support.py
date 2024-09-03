@@ -136,8 +136,12 @@ def generateAccount():
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@name="passwd"]'))) 
     Type_Me(element, passwordid)
     sleep(1)
-    element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
-    element.click()
+    try:
+        element = WebDriverWait(driver,5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
+        
+        element.click()
+    except:
+        pass
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="declineButton"]')))
     element.click()
     # Manual gamertag creation because api did not let me lmfao
@@ -146,14 +150,17 @@ def generateAccount():
         sleep(2)
         button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
         button.click()
+        sleep(2)
         try:
-            WebDriverWait(driver,6).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+            button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
             button.click()
         except:
-            button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-2"]')))
+            button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-2"]')))
             button.click()
-            WebDriverWait(driver,6).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+            sleep(2)
+            button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
             button.click()
+        
         #                               | Consent |                                 #
         wait.until(EC.title_contains('Consent'))
         sleep(2)
@@ -359,11 +366,16 @@ def fetchAccount():
     element.click()
     sleep(1)
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@name="passwd"]'))) 
-   
+    
     Type_Me(element, passwordid)
+    
     sleep(1)
-    element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
-    element.click()
+    try:
+        element = WebDriverWait(driver,5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
+        
+        element.click()
+    except:
+        pass
     sleep(1)
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="declineButton"]')))
     element.click()
@@ -373,8 +385,16 @@ def fetchAccount():
     button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
     button.click()
     sleep(2)
-    button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
-    button.click()
+    try:
+            button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+            button.click()
+    except:
+            button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-2"]')))
+            button.click()
+            sleep(2)
+            button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+            button.click()
+        
     #                               | Consent |                                 #
     wait.until(EC.title_contains('Consent'))
     sleep(2)
@@ -595,7 +615,7 @@ def redeemer():
                     fetchAccount()
                 else:
                     generateAccount()
-    # hey!
+    # Bro
 Input = input(">")
 if Input == "1":
     xbltoken = input(Fore.BLUE + "Enter your XBL token:")
