@@ -1,8 +1,3 @@
-# XAG got discontinued
-
-This project is no longer maintained. Code still works, you can delete the xag fetching part, turn it into something that logins on accounts from outlooks.txt etc
-
-
 # trial-redeemer-xag-support
 Selenium XGPC trial redeemer, but instead of creating accounts, uses XAG. More info in readme.
 
@@ -14,8 +9,6 @@ Known ones are:
 if account fetching fails because it was locked, it does not know how to try again and crashes. I dont know how to make it try again and copilot is NOT helping
 
 If selecting a pregenerated username on xbox gamertag set page fails, it just waits for you to click the other one
-
-If CC is invalid, waits for you to put a new one
 
 # How can i use XAG and what's it?
 XAG is basically a Microsoft account gen that you can generate and pull ready to redeem accounts from, so we don't have to solve captchas.
@@ -32,7 +25,19 @@ Put your codes in codes.txt like 1 code each line
 Put your vcc's in ccs.txt in number|MM|YY|CVV format
 Have the names.txt on the same folder as the script
 ```
-At line 42 there's a variable to put your XAG api key in. Again, join their discord server to earn credits and get an api key.
+At line 44 there's a variable to put your XAG api key in. Again, join their discord server to earn credits and get an api key.
+
+# Update 5
+
+The redeemer() function is rewritten (more like pasted from someone who sent their code, thanks @bubbb_)
+
+If a credit card fails, it retries. Here's one bug fixed for ya.
+
+XAG stock checking and balance checking removed for testing with api ratelimits
+
+If any bug happen because of this update please open an issue.
+
+Is this latest version? No, i have a dev version that has few more features but i'm gatekeeping because its horribly written and unfinished
 
 # Flags?
 
@@ -40,5 +45,5 @@ Flags are in-testing features. Current ones are:
 
 `--autoname` Automatically sets a profile name in FurinaXGP_random5letter format. You can change this on the bottom of the code.
 
-`--debug` Returns also JSON responses of XAG api calls.
+`--fromfile` Uses outlooks from "outlooks.txt" instead of XAG fetching. Indev feature.
 
