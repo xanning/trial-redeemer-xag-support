@@ -101,17 +101,29 @@ def generateAccount():
     headers = {
     "api-token": XAGtoken
     }
-    url = "https://start-pasting.today/api/generate?type=xbox"
-    response = requests.post(url, headers=headers)
-    data = response.json()
-    print(data)
-    account = data["account"]
-    global emailid
-    global passwordid
-    emailid = account["email"]
-    passwordid = account["password"]
-    username = account["username"]
-    print("fetched from XAG "+ emailid + ":" + passwordid) # I know this is stupid but the ratelimit..
+    while True:
+        try:
+            url = "https://start-pasting.today/api/generate?type=xbox"
+            response = requests.post(url, headers=headers)
+       
+            data = response.json()
+            account = data["account"]
+            global emailid
+            global passwordid
+            emailid = account["email"]
+            passwordid = account["password"]
+            username = account["username"]
+            print("fetched from XAG "+ emailid + ":" + passwordid)
+            break
+        except:
+            print(Fore.RED + "Failed to generate account, more details: " + response.text)
+            if "was locked" in response.text:
+                print(Fore.RED + "Account was locked, generating another one...")
+                print(Style.RESET_ALL)
+            if "stock" in response.text:
+                print(Fore.RED + "No stock, please wait for restock.")
+                print(Style.RESET_ALL)
+                exit()
     url = "https://xbox.com/en-US/auth/msa?action=logIn"
     driver.get(url)
     sleep(1)
@@ -134,10 +146,15 @@ def generateAccount():
         sleep(2)
         button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
         button.click()
-        sleep(2)
-        button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
-        button.click()
-        
+        try:
+            WebDriverWait(driver,6).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+            button.click()
+        except:
+            button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-2"]')))
+            button.click()
+            WebDriverWait(driver,6).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+            button.click()
+        #                               | Consent |                                 #
         wait.until(EC.title_contains('Consent'))
         sleep(2)
         button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
@@ -345,14 +362,12 @@ def fetchAccount():
    
     Type_Me(element, passwordid)
     sleep(1)
-    # Something here might go wrong didnt test yet
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
     element.click()
     sleep(1)
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="declineButton"]')))
     element.click()
     sleep(2)
-    # Might go wrong section end
     WebDriverWait(driver, 600000).until(EC.title_contains('Welcome to Xbox'))
     sleep(2)
     button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
@@ -580,7 +595,7 @@ def redeemer():
                     fetchAccount()
                 else:
                     generateAccount()
-    # Give robux
+    # hey!
 Input = input(">")
 if Input == "1":
     xbltoken = input(Fore.BLUE + "Enter your XBL token:")
