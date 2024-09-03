@@ -6,6 +6,8 @@ from selenium.webdriver.chrome.options import Options  # Required
 from selenium.webdriver.chrome.service import Service  # Required
 from selenium.webdriver.common.by import By  # Required
 from selenium.webdriver.support.ui import WebDriverWait  # Required
+from selenium.webdriver.common.keys import Keys 
+from selenium.common.exceptions import NoSuchElementException # required
 from selenium.webdriver.support import expected_conditions as EC # Probably don't need it.
 from selenium.webdriver.remote.webelement import WebElement # Probably don't need it.
 from random import randint, uniform, shuffle, choice # Required
@@ -50,13 +52,14 @@ print(Fore.RED + r"""
                                                                
     """)
 print(Style.RESET_ALL)
-print(Fore.GREEN + "I do not fucking know how to python")
+print(Fore.GREEN + "Brokenhearted")
 print(Fore.GREEN + " ")
 print(Fore.LIGHTCYAN_EX + "[XGPC Redeemer]")
 print(Fore.GREEN + " ")
 print(Fore.LIGHTCYAN_EX + "[1] Pre-check your codes")
 print(Fore.LIGHTCYAN_EX + "[2] Run redeemer")
-print(Fore.LIGHTRED_EX + "Changelog: Removed --debug")
+print(Fore.LIGHTRED_EX + "Changelog: Added --fromfile, recoded redeemer()")
+print(Fore.LIGHTRED_EX + " Removed XAG stock and balance checking.")
 print(Style.RESET_ALL) 
 
 driver = webdriver.Chrome(service=cService, options=options)
@@ -73,36 +76,42 @@ def Type_Me(element: WebElement, text: str):
 wait = WebDriverWait(driver, 1000) # Default timeout.
 
 def generateAccount():
+    # These are disabled because i believe causes IP based ratelimits.
+    # ===============================================================
+
+    #             | Check for stock  |
+    #   url = "https://start-pasting.today/api/stock"
+    #   response = requests.get(url)
+    #   data = response.json()
    
-    url = "https://start-pasting.today/api/stock"
-    response = requests.get(url)
-    data = response.json()
+    #   normal_accounts = data["normal_accounts"]
+    #   print(str(normal_accounts) + " accounts in XAG")
    
-    normal_accounts = data["normal_accounts"]
-    print(str(normal_accounts) + " accounts in XAG")
-    # Check for balance
-    url = "https://start-pasting.today/api/coins"
+    #            | Check for balance |
+    #   url = "https://start-pasting.today/api/coins"
+    #   response = requests.get(url, headers=headers)
+    
+    #   data = response.json()
+   
+    #   balance = data["coins"]
+    #   print(str(balance) + " balance")
+    # ===============================================================
+    
+    # Generate an account
     headers = {
     "api-token": XAGtoken
     }
-    response = requests.get(url, headers=headers)
-    
-    data = response.json()
-   
-    balance = data["coins"]
-    print(str(balance) + " balance")
-    # Generate an account
     url = "https://start-pasting.today/api/generate?type=xbox"
     response = requests.post(url, headers=headers)
     data = response.json()
-  
+    print(data)
     account = data["account"]
     global emailid
     global passwordid
     emailid = account["email"]
     passwordid = account["password"]
     username = account["username"]
-    print("fetched from XAG "+ emailid + ":" + passwordid + " | -4" + " | New balance: " + str(balance - 4)) # I know this is stupid but the ratelimit..
+    print("fetched from XAG "+ emailid + ":" + passwordid) # I know this is stupid but the ratelimit..
     url = "https://xbox.com/en-US/auth/msa?action=logIn"
     driver.get(url)
     sleep(1)
@@ -135,7 +144,7 @@ def generateAccount():
         button.click()
         wait.until(EC.title_contains('Xbox Official'))
     sleep(2)
-        
+
 def preCheckCodes(token):
     with open("codes.txt", "r") as file:
         codes = [line.strip() for line in file]
@@ -236,6 +245,19 @@ def get_urlPost_sFTTag(session):
         except: pass
         
 
+
+def read_first_line(path):
+    with open(path, "r") as file:
+        return file.readline()
+
+
+def delete_first_line(path):
+    with open(path, "r+") as file:
+        lines = file.readlines()
+        file.seek(0)
+        file.writelines(lines[1:])
+        file.truncate()
+
 def get_xbox_rps(session, email, password, urlPost, sFTTag):
             global bad, checked, cpm, twofa, retries, checked
             data = {'login': email, 'loginfmt': email, 'passwd': password, 'PPFT': sFTTag}
@@ -297,11 +319,61 @@ def authenticate(email, password, tries = 0):
        print(Fore.RED+f"Failed to namechange: {email}:{password}")
     finally:
         session.close()
-
+def fetchAccount():
+    global emailid
+    global passwordid
+    try:
+        combo = read_first_line("outlooks.txt")
+        emailid = combo.split(":")[0]
+        passwordid = combo.split(":")[1]
+        delete_first_line("outlooks.txt")
+        print("fetched from outlooks.txt | "+ emailid + ":" + passwordid)
+    except:
+        print("No more accounts in outlooks.txt, or you have a damaged file.")
+        exit()
+    url = "https://xbox.com/en-US/auth/msa?action=logIn"
+    driver.get(url)
+    sleep(1)
+    element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@name="loginfmt"]'))) 
+   
+    Type_Me(element, emailid)
+    sleep(1)
+    element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
+    element.click()
+    sleep(1)
+    element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@name="passwd"]'))) 
+   
+    Type_Me(element, passwordid)
+    sleep(1)
+    # Something here might go wrong didnt test yet
+    element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="idSIButton9"]'))) 
+    element.click()
+    sleep(1)
+    element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="declineButton"]')))
+    element.click()
+    sleep(2)
+    # Might go wrong section end
+    WebDriverWait(driver, 600000).until(EC.title_contains('Welcome to Xbox'))
+    sleep(2)
+    button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
+    button.click()
+    sleep(2)
+    button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+    button.click()
+    #                               | Consent |                                 #
+    wait.until(EC.title_contains('Consent'))
+    sleep(2)
+    button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+    button.click()
+    wait.until(EC.title_contains('Xbox Official'))
+    sleep(2)
 def redeemer():
-    start = input("Type 'start' to begin. \n Accepted flags are: \n \"--autoname\" (Sets profile automatically) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
+    start = input("Type 'start' to begin. \n Accepted flags are: \n \"--autoname\" (Sets profile automatically) \n \"--fromfile\" (Use outlooks.txt instead of XAG, must be no gamertag set) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
     if start.startswith('start'):
-        generateAccount()
+        if "--fromfile" in start:
+            fetchAccount()
+        else:
+            generateAccount()
                     
         # List of codes to check
         codes = []
@@ -335,92 +407,132 @@ def redeemer():
                 WebDriverWait(driver, 2000).until(EC.presence_of_element_located((By.ID, 'displayId_credit_card_visa_amex_mc_discover')))
                 credit_card = driver.find_element(By.ID,"displayId_credit_card_visa_amex_mc_discover")
                 credit_card.click()
-
-                WebDriverWait(driver, 2000).until(EC.presence_of_element_located((By.ID, 'accountToken')))
-                account_token = driver.find_element(By.ID,"accountToken")
-                account_token.click()
-                def get_random_cc_info():
-                    with open('ccs.txt', 'r') as file:
-                        lines = file.readlines()
-                        random_line = random.choice(lines)
-                        cc_info = random_line.split("|")
-                        cc_date1 = cc_info[1]
-                        cc_date2 = cc_info[2]
-                        cc_cvv = cc_info[3]
-                    return cc_info, cc_date1, cc_date2, cc_cvv
-                def do_payment():
-                 cc_info, cc_date1, cc_date2, cc_cvv = get_random_cc_info()
-                 account_token.send_keys(cc_info[0])
-                 name = driver.find_element(By.ID,"accountHolderName")
-                 name.click()
-                 name.send_keys('Alex')
-                 expiry_month = driver.find_element(By.ID, "input_expiryMonth")
-                 
-                 expiry_month.send_keys(cc_date1)
-
-                 expiry_year = driver.find_element(By.ID, "input_expiryYear")
-                 expiry_year.send_keys('27')
-
-                 cvv = driver.find_element(By.ID,"cvvToken")
-                 cvv.click()
-                 cvv.send_keys(cc_cvv)
-                 address_line1 = driver.find_element(By.ID,"address_line1")
-                 address_line1.click()
-                 address_line1.send_keys('9027 Fairground Circle')
-
-                 address_line2 = driver.find_element(By.ID,"city")
-                 address_line2.click()
-                 address_line2.send_keys('Oceanside')
-                
-                 region = driver.find_element(By.ID,"input_region")
-                
-                 region.send_keys('New York')
-
-                 postal = driver.find_element(By.ID,"postal_code")
-                 postal.click()
-                 postal.send_keys('11572')
-
-                 save1 = driver.find_element(By.ID,"pidlddc-button-saveButton")
-                 save1.click()
-                 WebDriverWait(driver, 5000).until(EC.presence_of_element_located((By.CLASS_NAME, "lightweight--qRCncd42.base--HZtGIsEc")))
-                get_random_cc_info()
-                do_payment()
-                sleep(3)
-                txt = driver.find_element(By.CLASS_NAME, 'lightweight--qRCncd42.base--HZtGIsEc')
-                txt.click()
-
-                WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, 'pidlddc-text-profileAddressPageSubheading')))
-                WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, 'pidlddc-text-profileAddressPageSubheading')))
-               
-                address_line1 = driver.find_element(By.ID,"address_line1")
-                address_line1.click()
-                address_line1.send_keys('9027 Fairground Circle')
-
-                address_line2 = driver.find_element(By.ID,"city")
-                address_line2.click()
-                address_line2.send_keys('Oceanside')
-                
-                region = driver.find_element(By.ID,"input_region")
-                
-                region.send_keys('New York')
-
-                postal = driver.find_element(By.ID,"postal_code")
-                postal.click()
-                postal.send_keys('11572')
-                save1 = driver.find_element(By.ID,"pidlddc-button-saveButton")
-                save1.click()
-                WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, 'pidlddc-button-addressUseButton')))
-
+                wait.until(EC.presence_of_element_located((By.ID, "accountToken")))
+                sleep(1)
+                #                           ======================================                      #
+                #       From this point, this beautiful and organized code with error handling is pasted from bubbb_  #
+                driver.find_element(By.ID, "address_line1").send_keys(Keys.CONTROL + "a")
+                driver.find_element(By.ID, "address_line1").send_keys(Keys.DELETE)
+                driver.find_element(By.ID, "city").send_keys(Keys.CONTROL + "a")
+                driver.find_element(By.ID, "city").send_keys(Keys.DELETE)
+                driver.find_element(By.ID, "input_region").send_keys(Keys.CONTROL + "a")
+                driver.find_element(By.ID, "input_region").send_keys(Keys.DELETE)
+                driver.find_element(By.ID, "postal_code").send_keys(Keys.CONTROL + "a")
+                driver.find_element(By.ID, "postal_code").send_keys(Keys.DELETE)
+                driver.find_element(By.ID, "address_line1").send_keys("9027 Fairground Circle")
+                driver.find_element(By.ID, "city").send_keys("Oceanside")
+                driver.find_element(By.ID, "input_region").send_keys("New York")
+                driver.find_element(By.ID, "postal_code").send_keys("11572")
 
                 sleep(1)
-                save2 = driver.find_element(By.ID,"pidlddc-button-addressUseButton")
-                save2.click()
+
+                need_profile_address = False
+                while True:
+
+                    line = read_first_line("ccs.txt")
+                    cc_info = line.split("|")
+                    cc = cc_info[0]
+                    cc_date1 = cc_info[1]
+                    cc_cvv = cc_info[3]
+                    delete_first_line("ccs.txt")
+
+                    driver.find_element(By.ID, "accountToken").click()
+                    driver.find_element(By.ID, "accountToken").send_keys(Keys.CONTROL + "a")
+                    driver.find_element(By.ID, "accountToken").send_keys(Keys.DELETE)
+                    driver.find_element(By.ID, "accountHolderName").click()
+                    driver.find_element(By.ID, "accountHolderName").send_keys(Keys.CONTROL + "a")
+                    driver.find_element(By.ID, "accountHolderName").send_keys(Keys.DELETE)
+                    driver.find_element(By.ID, "input_expiryMonth").click()
+                    driver.find_element(By.ID, "cvvToken").click()
+                    driver.find_element(By.ID, "cvvToken").send_keys(Keys.CONTROL + "a")
+                    driver.find_element(By.ID, "cvvToken").send_keys(Keys.DELETE)
+                    driver.find_element(By.ID, "accountToken").send_keys(cc)
+                    driver.find_element(By.ID, "accountHolderName").send_keys("Alex")
+                    driver.find_element(By.ID, "input_expiryMonth").send_keys(cc_date1)
+                    driver.find_element(By.ID, "input_expiryYear").send_keys("27")
+                    driver.find_element(By.ID, "cvvToken").send_keys(cc_cvv)
+
+                    driver.find_element(By.ID, "pidlddc-button-saveButton").click()
+
+                    sleep(2)
+                    worked = False
+                    while True:
+                        went_next = True
+                        try:
+                            went_next = driver.find_element(
+                                By.XPATH, "//*[contains(text(),'Add profile address')]"
+                            ).is_displayed()
+                        except:
+                            went_next = False
+
+                        if went_next:
+                            
+                            worked = True
+                            need_profile_address = True
+                            break
+
+                        went_next = True
+                        try:
+                            went_next = driver.find_element(
+                            By.XPATH, "//*[contains(text(),'CHANGE')]"
+                            ).is_displayed()
+                        except:
+                            went_next = False
+
+                        if went_next:
+                            print("Went next")
+                            worked = True
+                            break
+
+                        went_next = True
+                        try:
+                            driver.find_element(
+                            By.XPATH, "//*[contains(@class,'pidlddc-errorstroke')]"
+                            )
+                        except NoSuchElementException:
+                            went_next = False
+
+                        if went_next:
+                            print("Incorrect card")
+                            went_next = False
+                            worked = False
+                            break
+
+                        sleep(2)
+
+                    if worked:
+                        break
+
+                if need_profile_address:
+                    driver.find_element(
+                    By.XPATH, "//*[contains(text(),'Add profile address')]"
+                    ).click()
+                    wait.until(EC.presence_of_element_located((By.ID, "address_line1")))
+                    sleep(1)
+                    driver.find_element(By.ID, "address_line1").send_keys(Keys.CONTROL + "a")
+                    driver.find_element(By.ID, "address_line1").send_keys(Keys.CONTROL + "a")
+                    driver.find_element(By.ID, "address_line1").send_keys(Keys.DELETE)
+                    driver.find_element(By.ID, "city").send_keys(Keys.CONTROL + "a")
+                    driver.find_element(By.ID, "city").send_keys(Keys.DELETE)
+                    driver.find_element(By.ID, "input_region").send_keys(Keys.CONTROL + "a")
+                    driver.find_element(By.ID, "input_region").send_keys(Keys.DELETE)
+                    driver.find_element(By.ID, "postal_code").send_keys(Keys.CONTROL + "a")
+                    driver.find_element(By.ID, "postal_code").send_keys(Keys.DELETE)
+                    driver.find_element(By.ID, "address_line1").send_keys("9027 Fairground Circle")
+                    driver.find_element(By.ID, "city").send_keys("Oceanside")
+                    driver.find_element(By.ID, "input_region").send_keys("New York")
+                    driver.find_element(By.ID, "postal_code").send_keys("11572")
+                    driver.find_element(By.ID, "pidlddc-button-saveButton").click()
+                    WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, 'pidlddc-button-addressUseButton')))
+                    sleep(1)
+                    save2 = driver.find_element(By.ID,"pidlddc-button-addressUseButton")
+                    save2.click()
                 WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "primary--wA51gMLW.base--HZtGIsEc")))
                 sleep(1)
                 cbf = driver.find_element(By.CLASS_NAME, 'primary--wA51gMLW.base--HZtGIsEc')
                 cbf.click()
-                sleep(23)
-             
+                sleep(30)
+                #                            End of pasted code from bubbb_                            #
 
                 
                 global current_day
@@ -464,8 +576,11 @@ def redeemer():
                 driver.delete_all_cookies()
                 sleep(1)
               
-                generateAccount()
-                # pls god strike this nigga down
+                if "--fromfile" in start:
+                    fetchAccount()
+                else:
+                    generateAccount()
+    # Give robux
 Input = input(">")
 if Input == "1":
     xbltoken = input(Fore.BLUE + "Enter your XBL token:")
