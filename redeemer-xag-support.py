@@ -380,26 +380,31 @@ def fetchAccount():
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="declineButton"]')))
     element.click()
     sleep(2)
-    WebDriverWait(driver, 600000).until(EC.title_contains('Welcome to Xbox'))
-    sleep(2)
-    button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
-    button.click()
-    sleep(2)
     try:
+        WebDriverWait(driver, 15).until(EC.title_contains('Welcome to Xbox'))
+        sleep(2)
+        button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
+        button.click()
+        sleep(2)
+        try:
             button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
             button.click()
-    except:
+        except:
             button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-2"]')))
             button.click()
             sleep(2)
             button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
             button.click()
         
-    #                               | Consent |                                 #
-    wait.until(EC.title_contains('Consent'))
-    sleep(2)
-    button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
-    button.click()
+        #                               | Consent |                                 #
+        wait.until(EC.title_contains('Consent'))
+        sleep(2)
+        button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+        button.click()
+    except:
+        print("Something went wrong while setting gamertag. Maybe it's already set? Skipping.")
+        
+    
     wait.until(EC.title_contains('Xbox Official'))
     sleep(2)
 def redeemer():
@@ -577,7 +582,8 @@ def redeemer():
                 print(Fore.GREEN + '+ Redeemed ' + emailid + ':' + passwordid + ' | ' + str(current_month) + ' ' + str(current_day))
                 print(Style.RESET_ALL)
                 if "--autoname" in start:
-                    print(Fore.YELLOW + 'Attempting to set profile: ' + emailid + ':' + passwordid)
+                    name = "FurinaXGP_" + ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+                    print(Fore.YELLOW + 'Attempting to set profile: ' + emailid + ':' + passwordid + " | " + name)
                     
                     token = authenticate(emailid, passwordid)
                     
@@ -585,7 +591,7 @@ def redeemer():
 
                     headersget = {'Authorization': f'Bearer {token}', 'Accept': 'application/json', 'Content-Type': 'application/json'}
                     requests.get(urlget,headers=headersget)
-                    name = "FurinaXGP_" + ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+                    
                     sleep(2)
                     url = f"https://api.minecraftservices.com/minecraft/profile"
                     body = {
@@ -615,7 +621,7 @@ def redeemer():
                     fetchAccount()
                 else:
                     generateAccount()
-    # Bro
+    # I am going insane
 Input = input(">")
 if Input == "1":
     xbltoken = input(Fore.BLUE + "Enter your XBL token:")
