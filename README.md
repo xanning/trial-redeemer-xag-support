@@ -39,7 +39,9 @@ At line 44 there's a variable to put your XAG api key in. Again, join their disc
 
 The redeemer() function is rewritten (more like pasted from someone who sent their code, thanks @bubbb_)
 
-If a credit card fails, it retries. Here's one bug fixed for ya.
+If a credit card fails, it retries.
+
+If gamertag is set already, after a 10 second timeout, it continues without trying to set gamertag
 
 XAG stock checking and balance checking removed for testing with api ratelimits
 
