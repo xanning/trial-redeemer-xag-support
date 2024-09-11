@@ -1,11 +1,15 @@
 # trial-redeemer-xag-support
 Selenium XGPC trial redeemer, but instead of creating accounts, uses XAG. More info in readme.
 
-## IMPORTANT
+# very important
+
+**I dont do these anymore. If i update it, it's either i just wanted to work on something on free time, or something critical is updated. If it doesn't work, open an issue (you will not get a response %80), do not DM me.**
+
+## XAG api v2 notice
 
 If you're getting a weird error regenerate your api token again and download the update, XAG API updated to v2
 
-# What's the difference?
+# What's the difference with the other redeemer?
 This, instead of creating accounts itself, relies on XAG (Xbox account generator) API. More info below
 # Bugs?
 Known ones are:
@@ -50,8 +54,6 @@ If gamertag is set already, after a 10 second timeout, it continues without tryi
 XAG stock checking and balance checking removed for testing with api ratelimits
 
 If any bug happen because of this update please open an issue.
-
-Is this latest version? No, i have a dev version that has few more features but i'm gatekeeping because its horribly written and unfinished
 
 # Flags?
 
