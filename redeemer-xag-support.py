@@ -114,7 +114,7 @@ def generateAccount():
             global passwordid
             emailid = account["email"]
             passwordid = account["password"]
-            username = account["username"]
+            username = str(account["username"]["is_set"])
             print("fetched from XAG "+ emailid + ":" + passwordid)
             break
         except:
@@ -147,7 +147,7 @@ def generateAccount():
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="declineButton"]')))
     element.click()
     # Manual gamertag creation because api did not let me lmfao
-    if username == "unset":    
+    if username == "false":    
         WebDriverWait(driver, 600000).until(EC.title_contains('Welcome to Xbox'))
         sleep(2)
         button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
