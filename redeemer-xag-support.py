@@ -78,7 +78,9 @@ wait = WebDriverWait(driver, 1000) # Default timeout.
 def generateAccount():
     # These are disabled because i believe causes IP based ratelimits.
     # ===============================================================
+    # ===============================================================
 
+    #   Warning: THIS SHIT USES OLD API V1 I DIDNT UPDATE IT LOL
     #             | Check for stock  |
     #   url = "https://start-pasting.today/api/stock"
     #   response = requests.get(url)
@@ -103,11 +105,11 @@ def generateAccount():
     }
     while True:
         try:
-            url = "https://start-pasting.today/api/generate?type=xbox"
+            # insane change >>>> consider this as a recode!?!??!
+            url = "https://start-pasting.today/v2/api/generate?type=xbox"
             response = requests.post(url, headers=headers)
-       
             data = response.json()
-            account = data["account"]
+            account = data["account"]["details"]
             global emailid
             global passwordid
             emailid = account["email"]
@@ -621,7 +623,7 @@ def redeemer():
                     fetchAccount()
                 else:
                     generateAccount()
-    # I am going insane
+    # Danza Kuduro
 Input = input(">")
 if Input == "1":
     xbltoken = input(Fore.BLUE + "Enter your XBL token:")
