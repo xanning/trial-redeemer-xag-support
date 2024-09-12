@@ -101,7 +101,7 @@ def generateAccount():
     
     # Generate an account
     headers = {
-    "api-token": XAGtoken
+    "Authorization": XAGtoken
     }
     while True:
         try:
@@ -114,14 +114,16 @@ def generateAccount():
             global passwordid
             emailid = account["email"]
             passwordid = account["password"]
-            username = str(account["username"]["is_set"])
+            username = account["username"]["is_set"]
             print("fetched from XAG "+ emailid + ":" + passwordid)
             break
         except:
             print(Fore.RED + "Failed to generate account, more details: " + response.text)
+            sleep(2)
             if "was locked" in response.text:
                 print(Fore.RED + "Account was locked, generating another one...")
                 print(Style.RESET_ALL)
+                sleep(2)
             if "stock" in response.text:
                 print(Fore.RED + "No stock, please wait for restock.")
                 print(Style.RESET_ALL)
@@ -147,7 +149,7 @@ def generateAccount():
     element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="declineButton"]')))
     element.click()
     # Manual gamertag creation because api did not let me lmfao
-    if username == "false":    
+    if username == False:    
         WebDriverWait(driver, 600000).until(EC.title_contains('Welcome to Xbox'))
         sleep(2)
         button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="create-account-gamertag-suggestion-1"]')))
@@ -623,7 +625,7 @@ def redeemer():
                     fetchAccount()
                 else:
                     generateAccount()
-    # Danza Kuduro
+    # B-B-N-O-DOLLASIGN :speaking_head:
 Input = input(">")
 if Input == "1":
     xbltoken = input(Fore.BLUE + "Enter your XBL token:")
