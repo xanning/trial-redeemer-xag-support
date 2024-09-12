@@ -123,7 +123,7 @@ def generateAccount():
             if "was locked" in response.text:
                 print(Fore.RED + "Account was locked, generating another one...")
                 print(Style.RESET_ALL)
-                sleep(2)
+                
             if "stock" in response.text:
                 print(Fore.RED + "No stock, please wait for restock.")
                 print(Style.RESET_ALL)
