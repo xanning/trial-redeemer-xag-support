@@ -52,14 +52,13 @@ print(Fore.RED + r"""
                                                                
     """)
 print(Style.RESET_ALL)
-print(Fore.GREEN + "Brokenhearted")
+print(Fore.GREEN + "İnce bi' yağmur, caddem anlık")
 print(Fore.GREEN + " ")
 print(Fore.LIGHTCYAN_EX + "[XGPC Redeemer]")
 print(Fore.GREEN + " ")
 print(Fore.LIGHTCYAN_EX + "[1] Pre-check your codes")
 print(Fore.LIGHTCYAN_EX + "[2] Run redeemer")
-print(Fore.LIGHTRED_EX + "Changelog: Added --fromfile, recoded redeemer()")
-print(Fore.LIGHTRED_EX + " Removed XAG stock and balance checking.")
+print(Fore.LIGHTRED_EX + "Changelog: rewrite strings")
 print(Style.RESET_ALL) 
 
 driver = webdriver.Chrome(service=cService, options=options)
@@ -105,7 +104,6 @@ def generateAccount():
     }
     while True:
         try:
-            # insane change >>>> consider this as a recode!?!??!
             url = "https://start-pasting.today/v2/api/generate?type=xbox"
             response = requests.post(url, headers=headers)
             data = response.json()
@@ -115,18 +113,21 @@ def generateAccount():
             emailid = account["email"]
             passwordid = account["password"]
             username = account["username"]["is_set"]
-            print("fetched from XAG "+ emailid + ":" + passwordid)
+            print(Fore.YELLOW+"[XAG] " + Fore.GREEN + emailid + ":" + passwordid)
             break
         except:
             print(Fore.RED + "Failed to generate account, more details: " + response.text)
             sleep(2)
-            if "was locked" in response.text:
-                print(Fore.RED + "Account was locked, generating another one...")
+            if "Account locked" in response.text:
+                print(Fore.YELLOW+"[XAG] " +Fore.RED + "Account was locked, generating another one...")
                 print(Style.RESET_ALL)
                 
-            if "stock" in response.text:
-                print(Fore.RED + "No stock, please wait for restock.")
+            if "Out of Stock" in response.text:
+                print(Fore.YELLOW+"[XAG] " +Fore.RED + "No stock, please wait for restock.")
                 print(Style.RESET_ALL)
+                exit()
+            if response.status_code == 429:
+                print(Fore.YELLOW+"[XAG] " +Fore.RED + "Rate limited, exiting")
                 exit()
     url = "https://xbox.com/en-US/auth/msa?action=logIn"
     driver.get(url)
@@ -208,13 +209,13 @@ def preCheckCodes(token):
 
         response = requests.get(url, headers=headers)
         if response.status_code == 401:
-            print(Fore.RED + "Invalid token")
+            print(Fore.RED + "[CHCK] Invalid token")
             input("Press Enter to exit...")
             print(Style.RESET_ALL)
             exit()
         if response.text == "\"ClaimedOffersMaxed\"":
             used_count += 1
-            print(Fore.YELLOW + f"- {code} is used ({used_count})")
+            print(Fore.YELLOW + f"[-] {code} is used ({used_count})")
             with open("codes.txt", "r") as f:
                 lines = f.readlines()
             with open("codes.txt", "w") as f:
@@ -224,11 +225,11 @@ def preCheckCodes(token):
 
         elif response.text == "\"OfferValid\"":
             valid_count += 1
-            print(Fore.GREEN + f"+ {code} is eligible ({valid_count})")
+            print(Fore.GREEN + f"[+] {code} is eligible ({valid_count})")
             
         elif response.text == "\"OfferNotFound\"":
             invalid_count += 1
-            print(Fore.RED + f"- {code} is invalid ({invalid_count})") 
+            print(Fore.RED + f"[-] {code} is invalid ({invalid_count})") 
             with open("codes.txt", "r") as f:
                 lines = f.readlines()
             with open("codes.txt", "w") as f:
@@ -238,7 +239,7 @@ def preCheckCodes(token):
 
         elif response.text == "\"OfferAlreadyClaimed\"":
             invalid_count += 1
-            print(Fore.RED + f"- {code} is used ({used_count})")
+            print(Fore.RED + f"[-] {code} is used ({used_count})")
             with open("codes.txt", "r") as f:
                 lines = f.readlines()
             with open("codes.txt", "w") as f:
@@ -344,7 +345,7 @@ def authenticate(email, password, tries = 0):
             except: pass
             
     except:
-       print(Fore.RED+f"Failed to namechange: {email}:{password}")
+       print(Fore.YELLOW+"[MCAUTH] " +Fore.RED+f"Failed to namechange: {email}:{password}")
     finally:
         session.close()
 def fetchAccount():
@@ -355,7 +356,7 @@ def fetchAccount():
         emailid = combo.split(":")[0]
         passwordid = combo.split(":")[1]
         delete_first_line("outlooks.txt")
-        print("fetched from outlooks.txt | "+ emailid + ":" + passwordid)
+        print(Fore.YELLOW+"[CHCK] " +"Fetched from outlooks.txt | "+ Fore.GREEN + emailid + ":" + passwordid)
     except:
         print("No more accounts in outlooks.txt, or you have a damaged file.")
         exit()
@@ -406,28 +407,25 @@ def fetchAccount():
         button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
         button.click()
     except:
-        print("Something went wrong while setting gamertag. Maybe it's already set? Skipping.")
+        print(Fore.YELLOW+"[XBOX] " +"Something went wrong while setting gamertag. Maybe it's already set? Skipping.")
         
     
     wait.until(EC.title_contains('Xbox Official'))
     sleep(2)
 def redeemer():
-    start = input("Type 'start' to begin. \n Accepted flags are: \n \"--autoname\" (Sets profile automatically) \n \"--fromfile\" (Use outlooks.txt instead of XAG, must be no gamertag set) \n Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
+    start = input(Fore.CYAN + "Type 'start' to begin. \n"+Fore.LIGHTCYAN_EX+ "Accepted flags are: \n \"--autoname\" (Sets profile automatically) \n \"--fromfile\" (Use outlooks.txt instead of XAG, must be no gamertag set) \n"+Fore.YELLOW+" Warning: FLAGS ARE IN DEVELOPMENT, YOU MAY ENCOUNTER BUGS. \n > ")
     if start.startswith('start'):
         if "--fromfile" in start:
             fetchAccount()
         else:
             generateAccount()
-                    
-        # List of codes to check
+            
         codes = []
         with open('codes.txt', 'r') as file:
             for line in file:
                 code = line.strip()
                 codes.append(code)
         valid_count = 0
-       
-
         for code in codes:
             
             url = f'https://www.xbox.com/en-US/xbox-game-pass/invite-your-friends/redeem?offerId={code}' 
@@ -439,7 +437,7 @@ def redeemer():
             
 
             if 'Redeem your 14-day trial, then install the Xbox app to start playing.' in str(page_source2):
-                print(f'Code {code} is eligible')
+                print(Fore.YELLOW + "[REDEEM] " + Fore.GREEN + f'Code {code} is eligible')
                
                 valid_count += 1
                 redeem_button = driver.find_element(By.XPATH, "//button[text()='REDEEM NOW']")
@@ -524,7 +522,6 @@ def redeemer():
                             went_next = False
 
                         if went_next:
-                            print("Went next")
                             worked = True
                             break
 
@@ -537,7 +534,7 @@ def redeemer():
                             went_next = False
 
                         if went_next:
-                            print("Incorrect card")
+                            print(Fore.YELLOW+"[REDEEM] " + Fore.RED + "[CARD_DECLINED] "+ Fore.YELLOW+"("  + cc + ")")
                             went_next = False
                             worked = False
                             break
@@ -583,11 +580,11 @@ def redeemer():
                 global current_month
                 current_day = datetime.datetime.now().day
                 current_month = datetime.datetime.now().strftime("%b")
-                print(Fore.GREEN + '+ Redeemed ' + emailid + ':' + passwordid + ' | ' + str(current_month) + ' ' + str(current_day))
+                print(Fore.YELLOW + '[REDEEMED_XGP] ' + Fore.GREEN + emailid + ':' + passwordid + ' | ' + str(current_month) + ' ' + str(current_day))
                 print(Style.RESET_ALL)
                 if "--autoname" in start:
                     name = "FurinaXGP_" + ''.join(random.choices(string.ascii_letters + string.digits, k=5))
-                    print(Fore.YELLOW + 'Attempting to set profile: ' + emailid + ':' + passwordid + " | " + name)
+                    print(Fore.YELLOW + '[MCAUTH] ' + Fore.LIGHTCYAN_EX +'Attempting to set profile: ' + emailid + ':' + passwordid + " | " + name)
                     
                     token = authenticate(emailid, passwordid)
                     
@@ -605,10 +602,10 @@ def redeemer():
                     response = requests.post(url,headers=headers, json=body)
                     response_json = response.json()
                     if "ACTIVE" in str(response_json):
-                        print(Fore.GREEN + "+ " + emailid + ' + Name changed to ' + name)
+                        print(Fore.GREEN + "[MCAUTH] " + emailid + ' + Name changed to ' + name)
                         print(Style.RESET_ALL)
                     else:
-                        print(Fore.RED + "- " + emailid + ' - Name change failed:')
+                        print(Fore.RED + "[MCAUTH] " + emailid + ' - Name change failed:')
                         print(response_json)
                         print(Style.RESET_ALL)
                 
@@ -625,7 +622,7 @@ def redeemer():
                     fetchAccount()
                 else:
                     generateAccount()
-    # B-B-N-O-DOLLASIGN :speaking_head:
+    # Please dont test me >_<
 Input = input(">")
 if Input == "1":
     xbltoken = input(Fore.BLUE + "Enter your XBL token:")
