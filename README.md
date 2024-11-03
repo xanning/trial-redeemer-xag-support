@@ -1,13 +1,6 @@
-# NO LONGER MAINTAINED HERE
-# NO LONGER MAINTAINED HERE
-# NO LONGER MAINTAINED HERE
-
-## Please follow on https://github.com/xboxcomfd/buddypass for updates
-
-
 
 # trial-redeemer-xag-support
-Selenium XGPC trial redeemer, but instead of creating accounts, uses XAG. More info in readme.
+Selenium XGPC trial redeemer, has XAG support. More info in readme.
 
 # very important
 
