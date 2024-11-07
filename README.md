@@ -1,27 +1,15 @@
 
-# trial-redeemer-xag-support
+# XGP Trial Redeemer
 Selenium XGPC trial redeemer, has XAG support. More info in readme.
 
 # very important
 
 **I dont do these anymore. If i update it, it's either i just wanted to work on something on free time, or something critical is updated. If it doesn't work, open an issue (you will not get a response %80), do not DM me.**
 
-## XAG api v2 notice
-
-If you're getting a weird error regenerate your api token again and download the update, XAG API updated to v2
-
 # What's the difference with the other redeemer?
-This, instead of creating accounts itself, relies on XAG (Xbox account generator) API. More info below
+Does not have account creation.
 # Bugs?
 Known ones are:
-
-if account fetching fails because it was locked, it does not know how to try again and crashes. | Fixed
-
-If selecting a pregenerated username on xbox gamertag set page fails, it just waits for you to click the other one | Fixed
-
-^ Above bugs fixes are still in testing if anything out of ordinary happens please open an issue
-
-Non-fixed bugs:
 
 If Microsoft auth gives an error (contextid didnt match cookie) etc, it just hangs.
 
@@ -62,5 +50,5 @@ Flags are in-testing features. Current ones are:
 
 `--autoname` Automatically sets a profile name in FurinaXGP_random5letter format. You can change this on the bottom of the code.
 
-`--fromfile` Uses outlooks from "outlooks.txt" instead of XAG fetching. Indev feature.
+`--fromfile` Uses outlooks from "outlooks.txt" instead of XAG fetching.
 
