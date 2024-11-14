@@ -402,10 +402,13 @@ def fetchAccount():
             button.click()
         
         #                               | Consent |                                 #
-        wait.until(EC.title_contains('Consent'))
-        sleep(2)
-        button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
-        button.click()
+        try:
+            WebDriverWait(driver, 10).until(EC.title_contains('Consent'))
+            sleep(2)
+            button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="inline-continue-control"]')))
+            button.click()
+        except:
+            print(Fore.YELLOW+"[XBOX] " +"Skipping consent page (adjust).")
     except:
         print(Fore.YELLOW+"[XBOX] " +"Something went wrong while setting gamertag. Maybe it's already set? Skipping.")
         
