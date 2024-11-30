@@ -2,9 +2,14 @@
 # XGP Trial Redeemer
 Selenium XGPC trial redeemer, has XAG support. More info in readme.
 
-# very important
+# XAG Discontinued
+
+![image](https://github.com/user-attachments/assets/b38588e7-6bff-4e18-8e95-809eaf62bd23)
+
+# important
 
 **I dont do these anymore. If i update it, it's either i just wanted to work on something on free time, or something critical is updated. If it doesn't work, open an issue (you will not get a response %80), do not DM me.**
+
 
 # What's the difference with the other redeemer?
 Does not have account creation.
